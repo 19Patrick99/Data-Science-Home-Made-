@@ -1,0 +1,17 @@
+import yfinance as yf
+import pandas as pd
+import numpy as np
+
+database = yf.download('NQ=F')
+df = pd.DataFrame(database)
+
+# MULTI INDEX 
+df["Day's name"] = df.index.to_series().dt.day_name()
+df.drop(columns= ['Adj Close', 'Volume'])
+
+#CREAZIONE DAILY PERFORMANCE COLUMN
+conditions = [ df['Close'] - df['Open'] > 0,
+             df['Close'] - df['Open'] < 0,
+             df['Close'] - df['Open'] == 0]
+categories = ['RIALZO', 'RIBASS0', 'FLAT']
+df['Daily Performance'] = np.select(conditions, categories, default='Unknown')
